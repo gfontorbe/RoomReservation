@@ -8,20 +8,25 @@ namespace RoomReservation.Data
 {
 	public static class ApplicationDbInitializer
 	{
-		public static void Initialize(ApplicationDbContext context) {
+		public static async Task Initialize(ApplicationDbContext context) {
+			await SeedRolesAsync(context);
+			await SeedAdminAsync(context);
+			await SeedBasicUserAsync(context);
+		}
 
-			if (!context.Roles.Any())
-			{
-				var roles = new IdentityRole[]
-				{
-					new IdentityRole{Name="Admin", NormalizedName="ADMIN"},
-					new IdentityRole{Name="User", NormalizedName="USER"}
-				};
+		private static Task SeedBasicUserAsync(ApplicationDbContext context)
+		{
+			throw new NotImplementedException();
+		}
 
-				context.Roles.AddRange(roles);
+		private static Task SeedAdminAsync(ApplicationDbContext context)
+		{
+			throw new NotImplementedException();
+		}
 
-				context.SaveChanges();
-			}
+		private static Task SeedRolesAsync(ApplicationDbContext context)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
