@@ -16,9 +16,26 @@ namespace RoomReservation.Data
 			await SeedBasicUserAsync(context, userManager,roleManager);
 		}
 
-		private static Task SeedBasicUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+		private static async Task SeedBasicUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
-			throw new NotImplementedException();
+			var basicUser = new ApplicationUser
+			{
+				UserName = "basicUser",
+				Email = "basic@company.com",
+				EmailConfirmed = true,
+				FirstName = "Basic",
+				LastName = "User"
+			};
+
+			if (userManager.Users.All(u => u.Id != basicUser.Id))
+			{
+				var user = userManager.FindByEmailAsync(basicUser.Email);
+				if (user == null)
+				{
+					await userManager.CreateAsync(basicUser, "Pass123!");
+					await userManager.AddToRoleAsync(basicUser, Roles.Basic.ToString());
+				}
+			}
 		}
 
 		private static async Task SeedAdminAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
@@ -46,7 +63,7 @@ namespace RoomReservation.Data
 
 		private static async Task SeedRolesAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
-			if (!context.Roles.Any())
+			if (!roleManager.Roles.Any())
 			{
 				await roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
 				await roleManager.CreateAsync(new IdentityRole(Roles.Basic.ToString()));
