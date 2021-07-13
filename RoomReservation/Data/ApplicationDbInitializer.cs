@@ -29,7 +29,7 @@ namespace RoomReservation.Data
 
 			if (userManager.Users.All(u => u.Id != basicUser.Id))
 			{
-				var user = userManager.FindByEmailAsync(basicUser.Email);
+				var user = await userManager.FindByEmailAsync(basicUser.Email);
 				if (user == null)
 				{
 					await userManager.CreateAsync(basicUser, "Pass123!");
@@ -51,7 +51,7 @@ namespace RoomReservation.Data
 
 			if (userManager.Users.All(u => u.Id != adminUser.Id))
 			{
-				var user = userManager.FindByEmailAsync(adminUser.Email);
+				var user = await userManager.FindByEmailAsync(adminUser.Email);
 				if (user == null)
 				{
 					await userManager.CreateAsync(adminUser, "Pass123!");
