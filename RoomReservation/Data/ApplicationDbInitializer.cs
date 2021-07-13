@@ -11,12 +11,29 @@ namespace RoomReservation.Data
 	public static class ApplicationDbInitializer
 	{
 		public static async Task Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) {
-			await SeedRolesAsync(context, userManager,roleManager);
-			await SeedAdminAsync(context, userManager,roleManager);
-			await SeedBasicUserAsync(context, userManager,roleManager);
+			await SeedRolesAsync(roleManager);
+			await SeedAdminAsync(userManager);
+			await SeedBasicUserAsync(userManager);
+			await SeedRolesAsync(context);
 		}
 
-		private static async Task SeedBasicUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+		private static async Task SeedRolesAsync(ApplicationDbContext context)
+		{
+			if (!context.Rooms.Any())
+			{
+				var rooms = new Room[]
+				{
+					new Room{ Name = "Big Conference Room", Location="Building A Room 022", Description="Large conference room in the main building"},
+					new Room{ Name = "Small Conference Room", Location="Building A Room 135", Description="Small conference room in the main building"},
+					new Room{ Name = "East Conference Room", Location="Building C Room 007", Description="Conference room in the East building"}
+				};
+
+				await context.Rooms.AddRangeAsync(rooms);
+				await context.SaveChangesAsync();
+			}
+		}
+
+		private static async Task SeedBasicUserAsync(UserManager<ApplicationUser> userManager)
 		{
 			var basicUser = new ApplicationUser
 			{
@@ -38,7 +55,7 @@ namespace RoomReservation.Data
 			}
 		}
 
-		private static async Task SeedAdminAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+		private static async Task SeedAdminAsync(UserManager<ApplicationUser> userManager)
 		{
 			var adminUser = new ApplicationUser
 			{
@@ -61,7 +78,7 @@ namespace RoomReservation.Data
 			}
 		}
 
-		private static async Task SeedRolesAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+		private static async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
 		{
 			if (!roleManager.Roles.Any())
 			{

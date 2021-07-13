@@ -10,6 +10,9 @@ namespace RoomReservation.Data
 {
 	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
+		public DbSet<Room> Rooms { get; set; }
+		public DbSet<Reservation> Reservations { get; set; }
+
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
 		{
@@ -23,7 +26,7 @@ namespace RoomReservation.Data
 
 			// TODO: replace with custom user
 			// users table
-			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUser","Identity"));
+			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUsers","Identity"));
 
 			// roles table
 			builder.Entity<IdentityRole>(e => e.ToTable("Roles", "Identity"));

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace RoomReservation.Data.Migrations
 {
-    public partial class IntialMigration : Migration
+    public partial class InitialMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -115,6 +115,46 @@ namespace RoomReservation.Data.Migrations
                 table: "RoleClaims",
                 newName: "IX_RoleClaims_RoleId");
 
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                schema: "Identity",
+                table: "UserTokens",
+                type: "nvarchar(450)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(128)",
+                oldMaxLength: 128);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "LoginProvider",
+                schema: "Identity",
+                table: "UserTokens",
+                type: "nvarchar(450)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(128)",
+                oldMaxLength: 128);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "ProviderKey",
+                schema: "Identity",
+                table: "UserLogins",
+                type: "nvarchar(450)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(128)",
+                oldMaxLength: 128);
+
+            migrationBuilder.AlterColumn<string>(
+                name: "LoginProvider",
+                schema: "Identity",
+                table: "UserLogins",
+                type: "nvarchar(450)",
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(128)",
+                oldMaxLength: 128);
+
             migrationBuilder.AddPrimaryKey(
                 name: "PK_UserTokens",
                 schema: "Identity",
@@ -152,7 +192,7 @@ namespace RoomReservation.Data.Migrations
                 column: "Id");
 
             migrationBuilder.CreateTable(
-                name: "ApplicationUser",
+                name: "ApplicationUsers",
                 schema: "Identity",
                 columns: table => new
                 {
@@ -176,7 +216,7 @@ namespace RoomReservation.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ApplicationUser", x => x.Id);
+                    table.PrimaryKey("PK_ApplicationUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -207,10 +247,10 @@ namespace RoomReservation.Data.Migrations
                 {
                     table.PrimaryKey("PK_Reservations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Reservations_ApplicationUser_ReservingUserId",
+                        name: "FK_Reservations_ApplicationUsers_ReservingUserId",
                         column: x => x.ReservingUserId,
                         principalSchema: "Identity",
-                        principalTable: "ApplicationUser",
+                        principalTable: "ApplicationUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -224,13 +264,13 @@ namespace RoomReservation.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
                 schema: "Identity",
-                table: "ApplicationUser",
+                table: "ApplicationUsers",
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 schema: "Identity",
-                table: "ApplicationUser",
+                table: "ApplicationUsers",
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
@@ -256,32 +296,32 @@ namespace RoomReservation.Data.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_UserClaims_ApplicationUser_UserId",
+                name: "FK_UserClaims_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserClaims",
                 column: "UserId",
                 principalSchema: "Identity",
-                principalTable: "ApplicationUser",
+                principalTable: "ApplicationUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_UserLogins_ApplicationUser_UserId",
+                name: "FK_UserLogins_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserLogins",
                 column: "UserId",
                 principalSchema: "Identity",
-                principalTable: "ApplicationUser",
+                principalTable: "ApplicationUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_UserRoles_ApplicationUser_UserId",
+                name: "FK_UserRoles_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserRoles",
                 column: "UserId",
                 principalSchema: "Identity",
-                principalTable: "ApplicationUser",
+                principalTable: "ApplicationUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
 
@@ -296,12 +336,12 @@ namespace RoomReservation.Data.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_UserTokens_ApplicationUser_UserId",
+                name: "FK_UserTokens_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserTokens",
                 column: "UserId",
                 principalSchema: "Identity",
-                principalTable: "ApplicationUser",
+                principalTable: "ApplicationUsers",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
         }
@@ -314,17 +354,17 @@ namespace RoomReservation.Data.Migrations
                 table: "RoleClaims");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_UserClaims_ApplicationUser_UserId",
+                name: "FK_UserClaims_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserClaims");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_UserLogins_ApplicationUser_UserId",
+                name: "FK_UserLogins_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserLogins");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_UserRoles_ApplicationUser_UserId",
+                name: "FK_UserRoles_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserRoles");
 
@@ -334,7 +374,7 @@ namespace RoomReservation.Data.Migrations
                 table: "UserRoles");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_UserTokens_ApplicationUser_UserId",
+                name: "FK_UserTokens_ApplicationUsers_UserId",
                 schema: "Identity",
                 table: "UserTokens");
 
@@ -342,7 +382,7 @@ namespace RoomReservation.Data.Migrations
                 name: "Reservations");
 
             migrationBuilder.DropTable(
-                name: "ApplicationUser",
+                name: "ApplicationUsers",
                 schema: "Identity");
 
             migrationBuilder.DropTable(
@@ -427,6 +467,42 @@ namespace RoomReservation.Data.Migrations
                 name: "IX_RoleClaims_RoleId",
                 table: "AspNetRoleClaims",
                 newName: "IX_AspNetRoleClaims_RoleId");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Name",
+                table: "AspNetUserTokens",
+                type: "nvarchar(128)",
+                maxLength: 128,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(450)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "LoginProvider",
+                table: "AspNetUserTokens",
+                type: "nvarchar(128)",
+                maxLength: 128,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(450)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "ProviderKey",
+                table: "AspNetUserLogins",
+                type: "nvarchar(128)",
+                maxLength: 128,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(450)");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "LoginProvider",
+                table: "AspNetUserLogins",
+                type: "nvarchar(128)",
+                maxLength: 128,
+                nullable: false,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(450)");
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_AspNetUserTokens",
