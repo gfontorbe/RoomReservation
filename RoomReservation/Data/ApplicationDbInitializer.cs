@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using RoomReservation.Enums;
+using RoomReservation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,25 +10,29 @@ namespace RoomReservation.Data
 {
 	public static class ApplicationDbInitializer
 	{
-		public static async Task Initialize(ApplicationDbContext context) {
-			await SeedRolesAsync(context);
-			await SeedAdminAsync(context);
-			await SeedBasicUserAsync(context);
+		public static async Task Initialize(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) {
+			await SeedRolesAsync(context, userManager,roleManager);
+			await SeedAdminAsync(context, userManager,roleManager);
+			await SeedBasicUserAsync(context, userManager,roleManager);
 		}
 
-		private static Task SeedBasicUserAsync(ApplicationDbContext context)
+		private static Task SeedBasicUserAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
 			throw new NotImplementedException();
 		}
 
-		private static Task SeedAdminAsync(ApplicationDbContext context)
+		private static Task SeedAdminAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
 			throw new NotImplementedException();
 		}
 
-		private static Task SeedRolesAsync(ApplicationDbContext context)
+		private static async Task SeedRolesAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
-			throw new NotImplementedException();
+			if (!context.Roles.Any())
+			{
+				await roleManager.CreateAsync(new IdentityRole(Roles.Admin.ToString()));
+				await roleManager.CreateAsync(new IdentityRole(Roles.Basic.ToString()));
+			}
 		}
 	}
 }

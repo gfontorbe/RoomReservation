@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using RoomReservation.Data;
+using RoomReservation.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,16 +15,16 @@ namespace RoomReservation
 {
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var host = CreateHostBuilder(args).Build();
 
-			InitialzeDbIfNotExist(host);
+			await InitialzeDbIfNotExistAsync(host);
 
 			host.Run();
 		}
 
-		private static void InitialzeDbIfNotExist(IHost host)
+		private static async Task InitialzeDbIfNotExistAsync(IHost host)
 		{
 			using(var scope = host.Services.CreateScope())
 			{
@@ -30,7 +32,10 @@ namespace RoomReservation
 				try
 				{
 					var context = services.GetRequiredService<ApplicationDbContext>();
-					ApplicationDbInitializer.Initialize(context);
+					var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+					var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+
+					await ApplicationDbInitializer.Initialize(context, userManager, roleManager);
 				}
 				catch (Exception ex)
 				{
