@@ -33,7 +33,7 @@ namespace RoomReservation
 					Configuration.GetConnectionString("DefaultConnection")));
 			services.AddDatabaseDeveloperPageExceptionFilter();
 
-			services.AddIdentity<ApplicationUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+			services.AddIdentity<ApplicationUser,IdentityRole>()
 				.AddEntityFrameworkStores<ApplicationDbContext>()
 				.AddDefaultUI()
 				.AddDefaultTokenProviders();
