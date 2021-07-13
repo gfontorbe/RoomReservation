@@ -21,9 +21,27 @@ namespace RoomReservation.Data
 			throw new NotImplementedException();
 		}
 
-		private static Task SeedAdminAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+		private static async Task SeedAdminAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
 		{
-			throw new NotImplementedException();
+			var adminUser = new ApplicationUser
+			{
+				UserName = "admin",
+				Email = "admin@company.com",
+				EmailConfirmed = true,
+				FirstName = "Admin",
+				LastName = "User"
+			};
+
+			if (userManager.Users.All(u => u.Id != adminUser.Id))
+			{
+				var user = userManager.FindByEmailAsync(adminUser.Email);
+				if (user == null)
+				{
+					await userManager.CreateAsync(adminUser, "Pass123!");
+					await userManager.AddToRoleAsync(adminUser, Roles.Admin.ToString());
+					await userManager.AddToRoleAsync(adminUser, Roles.Basic.ToString());
+				}
+			}
 		}
 
 		private static async Task SeedRolesAsync(ApplicationDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
