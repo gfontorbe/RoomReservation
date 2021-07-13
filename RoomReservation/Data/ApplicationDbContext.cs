@@ -42,6 +42,13 @@ namespace RoomReservation.Data
 
 			// userTokens table
 			builder.Entity<IdentityUserToken<string>>(e => e.ToTable("UserTokens"));
+
+
+			// Rooms model table
+			builder.Entity<Room>(e => e.ToTable("Rooms"));
+
+			// Reservations model table
+			builder.Entity<Reservation>(e => e.ToTable("Reservations"));
 		}
 	}
 }
