@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using RoomReservation.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace RoomReservation.Data
 {
-	public class ApplicationDbContext : IdentityDbContext
+	public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)
@@ -22,7 +23,7 @@ namespace RoomReservation.Data
 
 			// TODO: replace with custom user
 			// users table
-			builder.Entity<IdentityUser>(e => e.ToTable("ApplicationUser"));
+			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUser"));
 
 			// roles table
 			builder.Entity<IdentityRole>(e => e.ToTable("Roles"));
