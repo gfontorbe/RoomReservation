@@ -19,29 +19,29 @@ namespace RoomReservation.Data
 		{
 			base.OnModelCreating(builder);
 
-			builder.HasDefaultSchema("Identity");
+			//builder.HasDefaultSchema("Identity");
 
 			// TODO: replace with custom user
 			// users table
-			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUser"));
+			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUser","Identity"));
 
 			// roles table
-			builder.Entity<IdentityRole>(e => e.ToTable("Roles"));
+			builder.Entity<IdentityRole>(e => e.ToTable("Roles", "Identity"));
 
 			// userRoles table
-			builder.Entity<IdentityUserRole<string>>(e => e.ToTable("UserRoles"));
+			builder.Entity<IdentityUserRole<string>>(e => e.ToTable("UserRoles", "Identity"));
 
 			// userClaims table
-			builder.Entity<IdentityUserClaim<string>>(e => e.ToTable("UserClaims"));
+			builder.Entity<IdentityUserClaim<string>>(e => e.ToTable("UserClaims", "Identity"));
 
 			// userLogin table
-			builder.Entity<IdentityUserLogin<string>>(e => e.ToTable("UserLogins"));
+			builder.Entity<IdentityUserLogin<string>>(e => e.ToTable("UserLogins", "Identity"));
 
 			// roleClaims table
-			builder.Entity<IdentityRoleClaim<string>>(e => e.ToTable("RoleClaims"));
+			builder.Entity<IdentityRoleClaim<string>>(e => e.ToTable("RoleClaims", "Identity"));
 
 			// userTokens table
-			builder.Entity<IdentityUserToken<string>>(e => e.ToTable("UserTokens"));
+			builder.Entity<IdentityUserToken<string>>(e => e.ToTable("UserTokens", "Identity"));
 
 
 			// Rooms model table
