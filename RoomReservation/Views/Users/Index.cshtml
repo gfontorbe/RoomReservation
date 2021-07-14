@@ -9,27 +9,27 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Id</th>
-            <th>FirstName</th>
-            <th>LastName</th>
-            <th>Email</th>
-            <th>UserName</th>
-            <th>Role</th>
+            <th>@Html.DisplayNameFor(m => m[0].Id)</th>
+            <th>@Html.DisplayNameFor(m => m[0].UserName)</th>
+            <th>@Html.DisplayNameFor(m => m[0].FirstName)</th>
+            <th>@Html.DisplayNameFor(m => m[0].LastName)</th>
+            <th>@Html.DisplayNameFor(m => m[0].Email)</th>
+            <th>@Html.DisplayNameFor(m => m[0].Roles)</th>
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var user in Model)
         {
-            <tr>
-                <td>@user.Id</td>
-                <td>@user.FirstName</td>
-                <td>@user.LastName</td>
-                <td>@user.Email</td>
-                <td>@user.UserName</td>
-                <td>@string.Join(" / ", user.Roles.ToList())</td>
-                <td><a class="btn btn-secondary">Manage Roles</a></td>
-            </tr>
+        <tr>
+            <td>@user.Id</td>
+            <td>@user.UserName</td>
+            <td>@user.FirstName</td>
+            <td>@user.LastName</td>
+            <td>@user.Email</td>
+            <td>@string.Join(" / ", user.Roles.ToList())</td>
+            <td><a class="btn btn-secondary">Manage Roles</a></td>
+        </tr>
         }
     </tbody>
 </table>
