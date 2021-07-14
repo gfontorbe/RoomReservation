@@ -24,7 +24,9 @@ namespace RoomReservation.Controllers
 
 		public async Task<IActionResult> Index()
 		{
-			var users = await _userManager.Users.ToListAsync();
+			var loggedUser = await _userManager.GetUserAsync(HttpContext.User);
+			var users = await _userManager.Users.Where(u => u.Id != loggedUser.Id).ToListAsync();
+
 			var usersViewModels = new List<UserViewModel>();
 
 			foreach (var user in users)
