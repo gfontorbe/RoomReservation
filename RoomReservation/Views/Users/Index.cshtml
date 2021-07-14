@@ -1,4 +1,4 @@
-﻿@model List<ApplicationUser>
+﻿@model List<UserViewModel>
 
 @{
     ViewData["Title"] = "Users";
@@ -13,6 +13,7 @@
             <th>FirstName</th>
             <th>LastName</th>
             <th>Email</th>
+            <th>UserName</th>
             <th>Role</th>
             <th>Action</th>
         </tr>
@@ -25,7 +26,8 @@
                 <td>@user.FirstName</td>
                 <td>@user.LastName</td>
                 <td>@user.Email</td>
-                <td>Roles</td>
+                <td>@user.UserName</td>
+                <td>@string.Join(" / ", user.Roles.ToList())</td>
                 <td><a class="btn btn-secondary">Manage Roles</a></td>
             </tr>
         }

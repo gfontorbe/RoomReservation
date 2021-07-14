@@ -25,8 +25,24 @@ namespace RoomReservation.Controllers
 		public async Task<IActionResult> Index()
 		{
 			var users = await _userManager.Users.ToListAsync();
+			var usersViewModels = new List<UserViewModel>();
 
-			return View(users);
+			foreach (var user in users)
+			{
+				var newUser = new UserViewModel
+				{
+					Id = user.Id,
+					FirstName = user.FirstName,
+					LastName = user.LastName,
+					UserName = user.UserName,
+					Email = user.Email,
+					Roles = await _userManager.GetRolesAsync(user)
+				};
+
+				usersViewModels.Add(newUser);
+			}
+
+			return View(usersViewModels);
 		}
 	}
 }
