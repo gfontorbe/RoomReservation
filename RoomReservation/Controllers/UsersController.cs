@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Core.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using RoomReservation.Models;
 using System;
@@ -22,10 +23,23 @@ namespace RoomReservation.Controllers
 			_roleManager = roleManager;
 		}
 
-		public async Task<IActionResult> Index()
+		public async Task<IActionResult> Index(string? searchString)
 		{
+			ViewData["SearchFilter"] = searchString;
+
 			var loggedUser = await _userManager.GetUserAsync(HttpContext.User);
-			var users = await _userManager.Users.Where(u => u.Id != loggedUser.Id).ToListAsync();
+			var users = await _userManager.Users.Where(u => u.Id != loggedUser.Id).OrderBy(u => u.UserName).ToListAsync();
+
+			if (!String.IsNullOrEmpty(searchString))
+			{
+				users = users.Where(
+					x => x.FirstName.ToLower().Contains(searchString.ToLower())
+				|| x.LastName.ToLower().Contains(searchString.ToLower())
+				|| x.Email.ToLower().Contains(searchString.ToLower())
+				|| x.UserName.ToLower().Contains(searchString.ToLower()))
+					.ToList();
+
+			}
 
 			var usersViewModels = new List<UserViewModel>();
 
@@ -45,6 +59,13 @@ namespace RoomReservation.Controllers
 			}
 
 			return View(usersViewModels);
+		}
+
+		public async Task<IActionResult> Edit(string id)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+
+			return View(user);
 		}
 	}
 }
