@@ -89,5 +89,14 @@ namespace RoomReservation.Controllers
 
 			return RedirectToAction("Index");
 		}
+
+		public async Task<IActionResult> Delete(string id)
+		{
+
+			var user = await _userManager.FindByIdAsync(id);
+			await _userManager.DeleteAsync(user);
+
+			return RedirectToAction("Index");
+		}
 	}
 }
