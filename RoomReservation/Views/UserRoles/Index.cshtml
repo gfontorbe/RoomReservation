@@ -1,0 +1,37 @@
+﻿@model ManageUserRolesViewModel
+
+@{
+    ViewData["Title"] = "Manage user roles";
+}
+
+<h1>Manage Roles for @Model.Username</h1>
+
+<div class="table-responsive">
+    <form asp-controller="userroles" method="post" asp-action="Update" asp-route-id="@Model.UserId" class="d-inline">
+        <table class="table table-striped" id="userRolesTable">
+            <thead>
+                <tr>
+                    <th>Role</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @for (int i = 0; i < Model.UserRoles.Count(); i++)
+                {
+                    <tr>
+                        <td>
+                            <input asp-for="@Model.UserRoles[i].RoleName" type="hidden" />
+                            @Model.UserRoles[i].RoleName
+                        </td>
+                        <td>
+                            <input asp-for="@Model.UserRoles[i].Selected" class="form-check-input" />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" id="save" class="btn bg-primary">Save</button>
+    </form>
+</div>
+
