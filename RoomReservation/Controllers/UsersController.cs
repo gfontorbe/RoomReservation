@@ -65,7 +65,29 @@ namespace RoomReservation.Controllers
 		{
 			var user = await _userManager.FindByIdAsync(id);
 
-			return View(user);
+			var userVM = new UserViewModel
+			{
+				Id = user.Id,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				UserName = user.UserName,
+				Email = user.Email
+			};
+
+			return View(userVM);
+		}
+
+		public async Task<IActionResult> Update(string id, UserViewModel model)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			user.FirstName = model.FirstName;
+			user.LastName = model.LastName;
+			user.UserName = model.UserName;
+			user.Email = model.Email;
+
+			await _userManager.UpdateAsync(user);
+
+			return RedirectToAction("Index");
 		}
 	}
 }

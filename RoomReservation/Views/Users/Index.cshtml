@@ -34,7 +34,14 @@
             <td>@user.LastName</td>
             <td>@user.Email</td>
             <td>@string.Join(" / ", user.Roles.ToList())</td>
-            <td><a class="btn btn-secondary">Manage Roles</a></td>
+            <td>
+            <div class="btn-group">
+                <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button>
+                <div class="dropdown-menu shadow">
+                    <a asp-controller="users" asp-action="Edit" asp-route-id="@user.Id" class="dropdown-item">Edit user</a>
+                    <a class="dropdown-item">Manage roles</a>
+                </div>
+            </div>
         </tr>
         }
     </tbody>
