@@ -27,7 +27,13 @@
                         @if (User.IsInRole(RoomReservation.Enums.Roles.Admin.ToString()))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
+                                <div class="btn-group">
+                                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Administration</button>
+                                    <div class="dropdown-menu shadow">
+                                        <a class="dropdown-item" asp-controller="rooms" asp-action="index">Rooms</a>
+                                        <a class="dropdown-item" asp-controller="users" asp-action="index">Users</a>
+                                    </div>
+                                </div>
                             </li>
                         }
                     </ul>
