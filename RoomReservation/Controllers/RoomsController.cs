@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,9 +23,20 @@ namespace RoomReservation.Controllers
         }
 
         // GET: Rooms
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? searchString)
         {
-            return View(await _context.Rooms.ToListAsync());
+            ViewData["SearchFilter"] = searchString;
+
+            var rooms = await _context.Rooms.ToListAsync();
+
+			if (!String.IsNullOrEmpty(searchString))
+			{
+                rooms = rooms.Where(x => x.Name.ToLower().Contains(searchString.ToLower())
+                || x.Location.ToLower().Contains(searchString.ToLower())
+                || x.Description.ToLower().Contains(searchString.ToLower())).ToList();
+			}
+
+            return View(rooms);
         }
 
         // GET: Rooms/Details/5
