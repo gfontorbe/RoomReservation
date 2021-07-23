@@ -1,0 +1,42 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+<h1>This is a test calendar</h1>
+<div id="calendarTest"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendarTest');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            /*Sets the header toolbar*/
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            /*Configure interaction when clicking on a date*/
+            dateClick: function (info) {
+                alert('clicked ' + info.dateStr);
+            },
+            /* Display events */
+            events:
+                [
+                    {
+                        title: 'test 1',
+                        start: '2021-07-22T12:30:00Z',
+                        end: '2021-07-22T13:00:00Z',
+                        editable: true
+                    },
+                    {
+                        title: 'test 2',
+                        start: '2021-07-24T12:30:00Z',
+                        end: '2021-07-24T14:30:00Z',
+                        editable: false
+                    }
+            ]
+
+        });
+
+        calendar.render();
+    });
+</script>
