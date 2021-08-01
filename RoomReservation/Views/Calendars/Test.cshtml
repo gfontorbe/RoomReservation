@@ -1,4 +1,10 @@
-﻿<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js"></script>
+﻿@model ReservationViewModel
+@{
+    ViewData["Title"] = "Calendar Test";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
 <h1>This is a test calendar</h1>
 <div id="calendarTest"></div>
@@ -19,8 +25,8 @@
                 alert('clicked ' + info.dateStr);
             },
             /* Display events */
-            events:
-                [
+            events: [@Html.Raw(Model.jsonData)]
+                /*[
                     {
                         title: 'test 1',
                         start: '2021-07-22T12:30:00Z',
@@ -33,7 +39,7 @@
                         end: '2021-07-24T14:30:00Z',
                         editable: false
                     }
-            ]
+            ]*/
 
         });
 
