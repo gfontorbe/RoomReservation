@@ -1,4 +1,4 @@
-﻿@model ReservationViewModel
+﻿@model String
 @{
     ViewData["Title"] = "Calendar Test";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,7 +25,7 @@
                 alert('clicked ' + info.dateStr);
             },
             /* Display events */
-            events: [@Html.Raw(Model.jsonData)]
+            events: @Html.Raw(Model)
                 /*[
                     {
                         title: 'test 1',

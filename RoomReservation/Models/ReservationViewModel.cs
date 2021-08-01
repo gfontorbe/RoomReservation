@@ -23,16 +23,5 @@ namespace RoomReservation.Models
 		public bool DurationEditable { get; set; }
 		[JsonPropertyName("overlap")]
 		public bool Overlap { get; set; }
-		[JsonIgnore]
-		public string jsonData { get { return ToJson(this); } }
-
-
-		public string ToJson(ReservationViewModel viewModel)
-		{
-			var options = new JsonSerializerOptions { WriteIndented = true };
-			string jsonString = JsonSerializer.Serialize(viewModel, options);
-
-			return jsonString;
-		}
 	}
 }
