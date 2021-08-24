@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.ProjectModel;
 using RoomReservation.Data;
 using RoomReservation.Models;
@@ -13,6 +16,7 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Controllers
 {
+	[Authorize]
 	public class CalendarsController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
@@ -24,10 +28,31 @@ namespace RoomReservation.Controllers
 			_context = context;
 		}
 
+		public async Task<IActionResult> Index()
+		{
+			var rooms = await _context.Rooms.ToListAsync();
+			rooms.OrderBy(x => x.Name);
+
+			return View(rooms);
+		}
+
+		public async Task<IActionResult> ViewCalendar(string id)
+		{
+			var connectedUser = await _userManager.FindByNameAsync(User.Identity.Name);
+			var room = await _context.Rooms.FindAsync(id);
+
+			var events = _context.Reservations.Select(x => x.ReservedRoom.Id == id).ToListAsync();
+
+			return View();
+		}
+
+		/*
 		public IActionResult Index()
 		{
 			var resUser = _userManager.FindByEmailAsync("basic@company.com").Result;
 			var resRoom = _context.Rooms.Find("1e090611-c2df-47e2-90b9-70197b9888e3");
+
+			var calendarVM = new CalendarViewModel();
 
 			List<ReservationViewModel> viewModels = new List<ReservationViewModel>();
 
@@ -78,8 +103,11 @@ namespace RoomReservation.Controllers
 			var jsonData = JsonSerializer.Serialize(viewModels, options);
 			// return View();
 
+			calendarVM.JSONData = jsonData;
+
 			// View for tests
-			return View("Test", jsonData);
+			return View("Test", calendarVM);
 		}
+		*/
 	}
 }
