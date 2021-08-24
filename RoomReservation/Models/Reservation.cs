@@ -11,14 +11,7 @@ namespace RoomReservation.Models
 		// Properties
 		public string Id { get; set; }
 		public DateTime StartingTime { get; set; }
-		public int Duration { get; set; }
-		public DateTime EndingTime
-		{
-			get
-			{
-				return StartingTime.AddMinutes(Duration);
-			}
-		}
+		public DateTime EndingTime { get; set; }
 
 		// Navigation Properties
 		public ApplicationUser ReservingUser { get; set; }

@@ -41,7 +41,7 @@ namespace RoomReservation.Controllers
 			var connectedUser = await _userManager.FindByNameAsync(User.Identity.Name);
 			var room = await _context.Rooms.FindAsync(id);
 
-			var reservations = await _context.Reservations.Where(x => x.ReservedRoom.Id == id).ToListAsync();
+			var reservations = await _context.Reservations.Where(x => x.ReservedRoom.Id == id).Include(r => r.ReservingUser).ToListAsync();
 
 			var reservationsVM = new List<ReservationViewModel>();
 
@@ -52,7 +52,7 @@ namespace RoomReservation.Controllers
 					Id = r.Id,
 					StartingTime = r.StartingTime,
 					EndingTime = r.EndingTime,
-					Title = $"{connectedUser.FirstName} {connectedUser.LastName}",
+					Title = $"{r.ReservingUser.FirstName} {r.ReservingUser.LastName}",
 					Editable = r.ReservingUser.Id == connectedUser.Id || User.IsInRole("Admin") ? true : false,
 					DurationEditable = r.ReservingUser.Id == connectedUser.Id || User.IsInRole("Admin") ? true : false,
 					Overlap = false

@@ -13,6 +13,12 @@
 <div id="CreateForm" class="card">
     <div class="card-header">New booking</div>
     <form asp-controller="Reservations" asp-action="Create" class="card-body">
+        <div class="form-group disabled">
+            <label asp-for="@Model.Room.Id" class="control-label"></label>
+            <input asp-for="@Model.Room.Id" class="form-control" value="@Model.Room.Id" />
+            <span asp-validation-for="@Model.Room" class="text-danger"></span>
+        </div>
+
         <div class="form-group">
             <label asp-for="@Model.ReservationToCreate.Id" class="control-label"></label>
             <input asp-for="@Model.ReservationToCreate.Id" class="form-control" />
@@ -24,9 +30,9 @@
             <span asp-validation-for="@Model.ReservationToCreate.StartingTime" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="@Model.ReservationToCreate.Duration" class="control-label"></label>
-            <input asp-for="@Model.ReservationToCreate.Duration" class="form-control" value="@DateTime.Now" />
-            <span asp-validation-for="@Model.ReservationToCreate.Duration" class="text-danger"></span>
+            <label asp-for="@Model.ReservationToCreate.EndingTime" class="control-label"></label>
+            <input asp-for="@Model.ReservationToCreate.EndingTime" class="form-control" value="@DateTime.Now" />
+            <span asp-validation-for="@Model.ReservationToCreate.EndingTime" class="text-danger"></span>
         </div>
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary" />
