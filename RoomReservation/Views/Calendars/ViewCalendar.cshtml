@@ -10,19 +10,11 @@
 <h1>Calendar for @Model.Room.Name</h1>
 <div id="calendar"></div>
 
-<div id="CreateForm" class="card">
+<div id="CreateForm">
     <div class="card-header">New booking</div>
     <form asp-controller="Reservations" asp-action="Create" class="card-body">
-        <div class="form-group disabled">
-            <label asp-for="@Model.Room.Id" class="control-label"></label>
-            <input asp-for="@Model.Room.Id" class="form-control" value="@Model.Room.Id" />
-            <span asp-validation-for="@Model.Room" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="@Model.ReservationToCreate.Id" class="control-label"></label>
-            <input asp-for="@Model.ReservationToCreate.Id" class="form-control" />
-            <span asp-validation-for="@Model.ReservationToCreate.Id" class="text-danger"></span>
+        <div class="form-group invisible">
+            <input asp-for="@Model.Room.Id" class="form-control" value="@Model.Room.Id" type="hidden" />
         </div>
         <div class="form-group">
             <label asp-for="@Model.ReservationToCreate.StartingTime" class="control-label"></label>
