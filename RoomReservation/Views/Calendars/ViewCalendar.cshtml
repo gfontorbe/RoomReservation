@@ -1,0 +1,59 @@
+﻿@model CalendarViewModel
+
+@{
+    ViewData["Title"] = "Calendar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+<h1>Calendar for @Model.Room.Name</h1>
+<div id="calendar"></div>
+
+<div id="CreateForm" class="card">
+    <div class="card-header">New booking</div>
+    <form asp-controller="Reservations" asp-action="Create" class="card-body">
+        <div class="form-group">
+            <label asp-for="@Model.ReservationToCreate.Id" class="control-label"></label>
+            <input asp-for="@Model.ReservationToCreate.Id" class="form-control" />
+            <span asp-validation-for="@Model.ReservationToCreate.Id" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.ReservationToCreate.StartingTime" class="control-label"></label>
+            <input asp-for="@Model.ReservationToCreate.StartingTime" class="form-control" value="@DateTime.Now" />
+            <span asp-validation-for="@Model.ReservationToCreate.StartingTime" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.ReservationToCreate.Duration" class="control-label"></label>
+            <input asp-for="@Model.ReservationToCreate.Duration" class="form-control" value="@DateTime.Now" />
+            <span asp-validation-for="@Model.ReservationToCreate.Duration" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            /*Sets the header toolbar*/
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            /*Configure interaction when clicking on a date*/
+            dateClick: function (info) {
+                alert('clicked ' + info.dateStr);
+            },
+            /* Display events */
+            events: @Html.Raw(Model.JSONData)
+        });
+
+        calendar.render();
+    });
+</script>

@@ -41,9 +41,32 @@ namespace RoomReservation.Controllers
 			var connectedUser = await _userManager.FindByNameAsync(User.Identity.Name);
 			var room = await _context.Rooms.FindAsync(id);
 
-			var events = _context.Reservations.Select(x => x.ReservedRoom.Id == id).ToListAsync();
+			var reservations = await _context.Reservations.Where(x => x.ReservedRoom.Id == id).ToListAsync();
 
-			return View();
+			var reservationsVM = new List<ReservationViewModel>();
+
+			foreach(var r in reservations)
+			{
+				ReservationViewModel viewModel = new ReservationViewModel
+				{
+					Id = r.Id,
+					StartingTime = r.StartingTime,
+					EndingTime = r.EndingTime,
+					Title = $"{connectedUser.FirstName} {connectedUser.LastName}",
+					Editable = r.ReservingUser.Id == connectedUser.Id || User.IsInRole("Admin") ? true : false,
+					DurationEditable = r.ReservingUser.Id == connectedUser.Id || User.IsInRole("Admin") ? true : false,
+					Overlap = false
+				};
+
+				reservationsVM.Add(viewModel);
+			}
+
+			var calendarVM = new CalendarViewModel();
+
+			calendarVM.Room = room;
+			calendarVM.JSONData = JsonSerializer.Serialize(reservationsVM, new JsonSerializerOptions { WriteIndented = true});
+
+			return View(calendarVM);
 		}
 
 		/*
