@@ -9,7 +9,7 @@ namespace RoomReservation.Models
 	{
 		public string JSONData { get; set; }
 		public Reservation ReservationToCreate { get; set; }
-
+		public Reservation ReservationToEdit { get; set; }
 		public Room Room { get; set; }
 	}
 }

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace RoomReservation.Controllers
 {
@@ -35,6 +36,26 @@ namespace RoomReservation.Controllers
 				await _context.SaveChangesAsync();
 
 				return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = reservation.ReservedRoom.Id });
+			}
+
+			return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = calendarViewModel.Room.Id });
+		}
+
+		public async Task<IActionResult> Edit(CalendarViewModel calendarViewModel)
+		{
+			// 1. Get id of the event
+			// 2. Modify startingtime and ending time
+			// 3. Save
+
+			var reservationInDb = await _context.Reservations.FindAsync(calendarViewModel.ReservationToEdit.Id); //Maybe need to include room and user?
+
+			if(reservationInDb.StartingTime != calendarViewModel.ReservationToEdit.StartingTime || reservationInDb.EndingTime != calendarViewModel.ReservationToEdit.EndingTime)
+			{
+				reservationInDb.StartingTime = calendarViewModel.ReservationToEdit.StartingTime;
+				reservationInDb.EndingTime = calendarViewModel.ReservationToEdit.EndingTime;
+
+				_context.Reservations.Update(reservationInDb);
+				await _context.SaveChangesAsync();
 			}
 
 			return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = calendarViewModel.Room.Id });
