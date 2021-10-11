@@ -22,9 +22,6 @@ namespace RoomReservation.Data
 		{
 			base.OnModelCreating(builder);
 
-			//builder.HasDefaultSchema("Identity");
-
-			// TODO: replace with custom user
 			// users table
 			builder.Entity<ApplicationUser>(e => e.ToTable("ApplicationUsers","Identity"));
 
