@@ -82,7 +82,43 @@
                     <div class="modal-footer">
                         <div class="form-group">
                             <input type="submit" value="Edit" class="btn btn-info" />
-                            <input type="submit" value="Delete" class="btn btn-danger" />
+                            <input type="button" value="Delete" class="btn btn-danger" onclick="deleteEvent()"/>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="DetailFormModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div id="EditForm">
+                <form asp-controller="Reservations" asp-action="Edit">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Booking details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Reserving user</label>
+                            <input class="form-control " id="DetailFormUser" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.StartingTime" class="control-label"></label>
+                            <input type="datetime-local" class="form-control" id="DetailFormStartingTime" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.EndingTime" class="control-label"></label>
+                            <input type="datetime-local" class="form-control" id="DetailFormEndingTime" disabled />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                         </div>
                     </div>
@@ -100,6 +136,10 @@
     var editFormId = document.getElementById("EditFormId");
     var editFormStartingTime = document.getElementById("EditFormStartingTime");
     var editFormEndingTime = document.getElementById("EditFormEndingTime");
+
+    var detailFormUser = document.getElementById("DetailFormUser");
+    var detailFormStartingTime = document.getElementById("DetailFormStartingTime");
+    var detailFormEndingTime = document.getElementById("DetailFormEndingTime");
 
     document.addEventListener('DOMContentLoaded', function () {
         var calendarEl = document.getElementById('calendar');
@@ -141,14 +181,24 @@
             editFormStartingTime.setAttribute('value', info.event.startStr.substring(0,info.event.startStr.length-6));
             editFormEndingTime.setAttribute('value', info.event.endStr.substring(0, info.event.endStr.length - 6));
         }
-        else if (info.event.startEditable == false) {
-            console.log("Clicked a non-editable event...");
-        }
-        else {
-            console.log("Event clicked but no info on editable")
+        else{
+            $("#DetailFormModal").modal('toggle');
+
+            detailFormUser.setAttribute('value', info.event.title);
+            detailFormStartingTime.setAttribute('value', info.event.startStr.substring(0, info.event.startStr.length - 6));
+            detailFormEndingTime.setAttribute('value', info.event.endStr.substring(0, info.event.endStr.length - 6));
         }
 
-        console.log(info.event);
+    }
+
+    async function deleteEvent() {
+        var eventId = $("#EditFormId").val().toString();
+
+        console.log($("#EditFormId").val());
+
+        await $.post("/Reservations/Delete", { id: eventId });
+
+        location.reload();
     }
 
 </script>
