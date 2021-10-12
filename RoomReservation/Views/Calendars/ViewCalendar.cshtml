@@ -1,0 +1,204 @@
+﻿@model CalendarViewModel
+
+@{
+    ViewData["Title"] = "Calendar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.8.0/main.min.css">
+<h1>Calendar for @Model.Room.Name</h1>
+<div id="calendar"></div>
+
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="CreateFormModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div id="CreateForm">
+                <form asp-controller="Reservations" asp-action="Create">
+                    <div class="modal-header">
+                        <h5 class="modal-title">New booking</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group invisible">
+                            <input asp-for="@Model.Room.Id" class="form-control" value="@Model.Room.Id" type="hidden" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToCreate.StartingTime" class="control-label"></label>
+                            <input asp-for="@Model.ReservationToCreate.StartingTime" class="form-control" value="@DateTime.Now.ToString("s")" id="CreateFormStartingTime" />
+                            <span asp-validation-for="@Model.ReservationToCreate.StartingTime" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToCreate.EndingTime" class="control-label"></label>
+                            <input asp-for="@Model.ReservationToCreate.EndingTime" class="form-control" value="@DateTime.Now.AddHours(1).ToString("s")" id="CreateFormEndingTime" />
+                            <span asp-validation-for="@Model.ReservationToCreate.EndingTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <input type="submit" value="Create" class="btn btn-primary" />
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="EditFormModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div id="EditForm">
+                <form asp-controller="Reservations" asp-action="Edit">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit booking</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group invisible">
+                            <input asp-for="@Model.ReservationToEdit.Id" class="form-control" type="hidden" id="EditFormId" />
+                        </div>
+                        <div class="form-group invisible">
+                            <input asp-for="@Model.Room.Id" class="form-control" value="@Model.Room.Id" type="hidden" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.StartingTime" class="control-label"></label>
+                            <input asp-for="@Model.ReservationToEdit.StartingTime" class="form-control" id="EditFormStartingTime"/>
+                            <span asp-validation-for="@Model.ReservationToEdit.StartingTime" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.EndingTime" class="control-label"></label>
+                            <input asp-for="@Model.ReservationToEdit.EndingTime" class="form-control" id="EditFormEndingTime" />
+                            <span asp-validation-for="@Model.ReservationToEdit.EndingTime" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <input type="submit" value="Edit" class="btn btn-info" />
+                            <input type="button" value="Delete" class="btn btn-danger" onclick="deleteEvent()"/>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="DetailFormModal">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div id="EditForm">
+                <form asp-controller="Reservations" asp-action="Edit">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Booking details</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Reserving user</label>
+                            <input class="form-control " id="DetailFormUser" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.StartingTime" class="control-label"></label>
+                            <input type="datetime-local" class="form-control" id="DetailFormStartingTime" disabled/>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="@Model.ReservationToEdit.EndingTime" class="control-label"></label>
+                            <input type="datetime-local" class="form-control" id="DetailFormEndingTime" disabled />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var createForm = document.getElementById("CreateForm");
+    var createFormStartingTime = document.getElementById("CreateFormStartingTime");
+    var createFormEndingTime = document.getElementById("CreateFormEndingTime");
+
+    var editFormId = document.getElementById("EditFormId");
+    var editFormStartingTime = document.getElementById("EditFormStartingTime");
+    var editFormEndingTime = document.getElementById("EditFormEndingTime");
+
+    var detailFormUser = document.getElementById("DetailFormUser");
+    var detailFormStartingTime = document.getElementById("DetailFormStartingTime");
+    var detailFormEndingTime = document.getElementById("DetailFormEndingTime");
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            /*Sets the header toolbar*/
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+
+            /*Configure interaction when clicking on a date*/
+            dateClick: function (info) { toggleCreateForm(info);},
+
+            /*Configure interaction when clicking on an event*/
+            eventClick: function (info) { toggleEditForm(info);},
+
+            /* Display events */
+            events: @Html.Raw(Model.JSONData)
+        });
+
+        calendar.render();
+    });
+
+    function toggleCreateForm(info) {
+        $("#CreateFormModal").modal('toggle');
+
+        createFormStartingTime.setAttribute('value', info.dateStr + "T08:00:00");
+        createFormEndingTime.setAttribute('value', info.dateStr + "T17:00:00");
+    };
+
+    function toggleEditForm(info) {
+
+        if (info.event.startEditable == true) {
+            $("#EditFormModal").modal('toggle');
+
+            editFormId.setAttribute('value', info.event.id);
+            editFormStartingTime.setAttribute('value', info.event.startStr.substring(0,info.event.startStr.length-6));
+            editFormEndingTime.setAttribute('value', info.event.endStr.substring(0, info.event.endStr.length - 6));
+        }
+        else{
+            $("#DetailFormModal").modal('toggle');
+
+            detailFormUser.setAttribute('value', info.event.title);
+            detailFormStartingTime.setAttribute('value', info.event.startStr.substring(0, info.event.startStr.length - 6));
+            detailFormEndingTime.setAttribute('value', info.event.endStr.substring(0, info.event.endStr.length - 6));
+        }
+
+    }
+
+    async function deleteEvent() {
+        var eventId = $("#EditFormId").val().toString();
+
+        console.log($("#EditFormId").val());
+
+        await $.post("/Reservations/Delete", { id: eventId });
+
+        location.reload();
+    }
+
+</script>
