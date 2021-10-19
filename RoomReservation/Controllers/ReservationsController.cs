@@ -36,10 +36,9 @@ namespace RoomReservation.Controllers
 				_context.Add(reservation);
 				await _context.SaveChangesAsync();
 
-				return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = reservation.ReservedRoom.Id });
+				return RedirectToRoute("return",routeValues: new {controller= "Calendars", action="ViewCalendar", id = reservation.ReservedRoom.Id });
 			}
-
-			return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = calendarViewModel.Room.Id });
+			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = calendarViewModel.Room.Id });
 		}
 
 		public async Task<IActionResult> Edit(CalendarViewModel calendarViewModel)
@@ -56,7 +55,7 @@ namespace RoomReservation.Controllers
 				await _context.SaveChangesAsync();
 			}
 
-			return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = calendarViewModel.Room.Id });
+			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = calendarViewModel.Room.Id });
 		}
 
 		[HttpPost]
@@ -73,7 +72,7 @@ namespace RoomReservation.Controllers
 
 			//return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = reservationToDelete.ReservedRoom.Id });
 
-			return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = reservationToDelete.ReservedRoom.Id });
+			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = reservationToDelete.ReservedRoom.Id });
 		}
 	}
 }

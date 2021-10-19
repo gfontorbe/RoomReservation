@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using RoomReservation.Models;
+using Microsoft.Extensions.Options;
+using RoomReservation.Options;
 
 namespace RoomReservation.Areas.Identity.Pages.Account
 {
@@ -19,15 +21,17 @@ namespace RoomReservation.Areas.Identity.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+		private readonly IOptions<RoutingOptions> _options;
+		private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LoginModel> _logger;
 
         public LoginModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginModel> logger,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager, IOptions<RoutingOptions> options)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
+			_options = options;
+			_signInManager = signInManager;
             _logger = logger;
         }
 
@@ -62,19 +66,19 @@ namespace RoomReservation.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content(_options.Value.Root);
 
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-            ReturnUrl = returnUrl;
+            ReturnUrl = "~/RoomReservationDemo/";
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            returnUrl ??= Url.Content(_options.Value.Root);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -92,7 +96,7 @@ namespace RoomReservation.Areas.Identity.Pages.Account
                     if (result.Succeeded)
                     {
                         _logger.LogInformation("User logged in.");
-                        return LocalRedirect(returnUrl);
+                        return LocalRedirect(_options.Value.Root);
                     }
                     if (result.RequiresTwoFactor)
                     {

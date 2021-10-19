@@ -57,16 +57,16 @@ namespace RoomReservation.Controllers
             return View(room);
         }
 
-        // GET: Rooms/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+		// GET: Rooms/Create
+		public IActionResult Create()
+		{
+			return View();
+		}
 
-        // POST: Rooms/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+		// POST: Rooms/Create
+		// To protect from overposting attacks, enable the specific properties you want to bind to.
+		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Location,Description")] Room room)
         {
@@ -79,26 +79,26 @@ namespace RoomReservation.Controllers
             return View(room);
         }
 
-        // GET: Rooms/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+		// GET: Rooms/Edit/5
+		public async Task<IActionResult> Edit(string id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
-            var room = await _context.Rooms.FindAsync(id);
-            if (room == null)
-            {
-                return NotFound();
-            }
-            return View(room);
-        }
+			var room = await _context.Rooms.FindAsync(id);
+			if (room == null)
+			{
+				return NotFound();
+			}
+			return View(room);
+		}
 
-        // POST: Rooms/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+		// POST: Rooms/Edit/5
+		// To protect from overposting attacks, enable the specific properties you want to bind to.
+		// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Location,Description")] Room room)
         {
@@ -125,38 +125,38 @@ namespace RoomReservation.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToRoute(routeName: "return", routeValues: new {controller = "Rooms", action = "Index"});
             }
             return View(room);
         }
 
-        // GET: Rooms/Delete/5
-        public async Task<IActionResult> Delete(string id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+		// GET: Rooms/Delete/5
+		public async Task<IActionResult> Delete(string id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
-            var room = await _context.Rooms
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (room == null)
-            {
-                return NotFound();
-            }
+			var room = await _context.Rooms
+				.FirstOrDefaultAsync(m => m.Id == id);
+			if (room == null)
+			{
+				return NotFound();
+			}
 
-            return View(room);
-        }
+			return View(room);
+		}
 
-        // POST: Rooms/Delete/5
-        [HttpPost, ActionName("Delete")]
+		// POST: Rooms/Delete/5
+		[HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var room = await _context.Rooms.FindAsync(id);
             _context.Rooms.Remove(room);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToRoute(routeName: "return", routeValues: new { controller = "Rooms", action = "Index" });
         }
 
         private bool RoomExists(string id)

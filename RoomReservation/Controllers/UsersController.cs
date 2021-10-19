@@ -87,7 +87,7 @@ namespace RoomReservation.Controllers
 
 			await _userManager.UpdateAsync(user);
 
-			return RedirectToAction("Index");
+			return RedirectToRoute(routeName: "return", routeValues: new { controller = "Users", action = "Index" });
 		}
 
 		public async Task<IActionResult> Delete(string id)
@@ -96,7 +96,7 @@ namespace RoomReservation.Controllers
 			var user = await _userManager.FindByIdAsync(id);
 			await _userManager.DeleteAsync(user);
 
-			return RedirectToAction("Index");
+			return RedirectToRoute(routeName: "return", routeValues: new { controller = "Users", action = "Index" });
 		}
 	}
 }

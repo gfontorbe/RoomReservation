@@ -1,4 +1,6 @@
-﻿@model CalendarViewModel
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model CalendarViewModel
 
 @{
     ViewData["Title"] = "Calendar";
@@ -129,6 +131,8 @@
 </div>
 
 <script>
+    var rootUrl = @Json.Serialize(@Configuration.GetSection("Routing").GetSection("Root").Value);
+
     var createForm = document.getElementById("CreateForm");
     var createFormStartingTime = document.getElementById("CreateFormStartingTime");
     var createFormEndingTime = document.getElementById("CreateFormEndingTime");

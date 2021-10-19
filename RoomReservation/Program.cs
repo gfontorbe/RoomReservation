@@ -8,6 +8,7 @@ using RoomReservation.Data;
 using RoomReservation.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,6 +50,8 @@ namespace RoomReservation
 			Host.CreateDefaultBuilder(args)
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
+					//webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
+					//webBuilder.UseUrls("https://localhost:5001");
 					webBuilder.UseStartup<Startup>();
 				});
 	}
