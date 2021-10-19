@@ -9,8 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using RoomReservation.Data;
 using RoomReservation.Models;
+using RoomReservation.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,10 +43,12 @@ namespace RoomReservation
 				.AddDefaultTokenProviders();
 
 			services.AddControllersWithViews();
+
+			services.Configure<RoutingOptions>(Configuration.GetSection(RoutingOptions.Routing));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IOptions<RoutingOptions> options)
 		{
 			if (env.IsDevelopment())
 			{
@@ -76,6 +80,9 @@ namespace RoomReservation
 				endpoints.MapControllerRoute(
 					name: "default",
 					pattern: "{controller=Home}/{action=Index}/{id?}");
+				endpoints.MapControllerRoute(
+					name: "return",
+					pattern: options.Value.Root +"{controller=Home}/{action=Index}/{id?}");
 				endpoints.MapRazorPages();
 			});
 		}

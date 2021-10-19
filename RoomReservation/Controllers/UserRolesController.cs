@@ -68,7 +68,7 @@ namespace RoomReservation.Controllers
 			var currentUser = await _userManager.GetUserAsync(User);
 			await _signInManager.RefreshSignInAsync(currentUser);
 
-			return RedirectToAction("Index", new { userId = id });
+			return RedirectToRoute(routeName: "return", routeValues: new { controller = "UserRoles", action = "Index", userId = id });
 
 		}
 	}
