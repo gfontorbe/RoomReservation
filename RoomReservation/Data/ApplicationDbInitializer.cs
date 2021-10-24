@@ -14,10 +14,10 @@ namespace RoomReservation.Data
 			await SeedRolesAsync(roleManager);
 			await SeedAdminAsync(userManager);
 			await SeedBasicUserAsync(userManager);
-			await SeedRolesAsync(context);
+			await SeedRoomsAsync(context);
 		}
 
-		private static async Task SeedRolesAsync(ApplicationDbContext context)
+		private static async Task SeedRoomsAsync(ApplicationDbContext context)
 		{
 			if (!context.Rooms.Any())
 			{
