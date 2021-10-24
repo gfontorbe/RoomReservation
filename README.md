@@ -13,6 +13,7 @@ Developed using:
 * C#9
 * .NET 5.0
 * Entity Framework
+* Bootstrap
 ### Dependencies
 * FullCalendar ([link](https://fullcalendar.io/))
 ### Configuration
