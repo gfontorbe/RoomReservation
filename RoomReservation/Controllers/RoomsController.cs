@@ -72,6 +72,7 @@ namespace RoomReservation.Controllers
         {
             if (ModelState.IsValid)
             {
+                room.Id = Guid.NewGuid().ToString();
                 _context.Add(room);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
