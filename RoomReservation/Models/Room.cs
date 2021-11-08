@@ -1,4 +1,5 @@
-﻿using RoomReservation.Validations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using RoomReservation.Validations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Models
 {
-	public class Room
+	public class Room : IAppModel
 	{
 		public string Id { get; set; }
 		[Required]
