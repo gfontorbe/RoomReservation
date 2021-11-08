@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using RoomReservation.Data;
+using RoomReservation.Data.Repositories;
 using RoomReservation.Models;
 
 namespace RoomReservation.Controllers
@@ -15,19 +16,19 @@ namespace RoomReservation.Controllers
     [Authorize(Roles ="Admin")]
     public class RoomsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+		private readonly IRepository<Room> _repository;
 
-        public RoomsController(ApplicationDbContext context)
+		public RoomsController(IRepository<Room> repository)
         {
-            _context = context;
-        }
+			_repository = repository;
+		}
 
         // GET: Rooms
         public async Task<IActionResult> Index(string? searchString)
         {
             ViewData["SearchFilter"] = searchString;
 
-            var rooms = await _context.Rooms.ToListAsync();
+            var rooms = await _repository.GetAllAsync();
 
 			if (!String.IsNullOrEmpty(searchString))
 			{
@@ -47,8 +48,8 @@ namespace RoomReservation.Controllers
                 return NotFound();
             }
 
-            var room = await _context.Rooms
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var room = await _repository.GetByIdAsync(id);
+
             if (room == null)
             {
                 return NotFound();
@@ -73,8 +74,9 @@ namespace RoomReservation.Controllers
             if (ModelState.IsValid)
             {
                 room.Id = Guid.NewGuid().ToString();
-                _context.Add(room);
-                await _context.SaveChangesAsync();
+
+                await _repository.AddAsync(room);
+
                 return RedirectToAction(nameof(Index));
             }
             return View(room);
@@ -88,7 +90,8 @@ namespace RoomReservation.Controllers
 				return NotFound();
 			}
 
-			var room = await _context.Rooms.FindAsync(id);
+            var room = await _repository.GetByIdAsync(id);
+
 			if (room == null)
 			{
 				return NotFound();
@@ -112,12 +115,11 @@ namespace RoomReservation.Controllers
             {
                 try
                 {
-                    _context.Update(room);
-                    await _context.SaveChangesAsync();
+                    await _repository.UpdateAsync(room);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!RoomExists(room.Id))
+                    if (!await RoomExists(room.Id))
                     {
                         return NotFound();
                     }
@@ -139,8 +141,8 @@ namespace RoomReservation.Controllers
 				return NotFound();
 			}
 
-			var room = await _context.Rooms
-				.FirstOrDefaultAsync(m => m.Id == id);
+            var room = await _repository.GetByIdAsync(id);
+
 			if (room == null)
 			{
 				return NotFound();
@@ -154,15 +156,17 @@ namespace RoomReservation.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var room = await _context.Rooms.FindAsync(id);
-            _context.Rooms.Remove(room);
-            await _context.SaveChangesAsync();
+            var room = await _repository.GetByIdAsync(id);
+
+            await _repository.DeleteAsync(room);
+
             return RedirectToRoute(routeName: "return", routeValues: new { controller = "Rooms", action = "Index" });
         }
 
-        private bool RoomExists(string id)
+        private async Task<bool> RoomExists(string id)
         {
-            return _context.Rooms.Any(e => e.Id == id);
+            var room = await _repository.GetByIdAsync(id);
+            return room != null;
         }
     }
 }
