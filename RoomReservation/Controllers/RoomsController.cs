@@ -37,7 +37,7 @@ namespace RoomReservation.Controllers
                 || x.Description.ToLower().Contains(searchString.ToLower())).ToList();
 			}
 
-            return View(rooms);
+            return View(rooms); 
         }
 
         // GET: Rooms/Details/5

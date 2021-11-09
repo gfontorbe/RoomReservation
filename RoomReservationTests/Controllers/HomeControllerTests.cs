@@ -4,22 +4,19 @@ using RoomReservation.Controllers;
 using System;
 using Xunit;
 
-namespace RoomReservationTests
+namespace RoomReservationTests.Controllers
 {
 	public class HomeControllerTests
 	{
-		private readonly HomeController _controller;
-
-		public HomeControllerTests()
-		{
-			_controller = new HomeController();
-		}
-
 		[Fact]
 		public void IndexReturnsViewResult()
 		{
-			var result = _controller.Index();
+			// Arrange
+			var controller = new HomeController();
+			// Act
+			var result = controller.Index();
 
+			// Assert
 			Assert.IsType<ViewResult>(result);
 		}
 	}
