@@ -14,12 +14,17 @@ namespace RoomReservationTests.Controllers
 {
     public class RoomsControllerTests
     {
+        private readonly List<Room> _data;
         private readonly Mock<IRepository<Room>> _repo;
         public RoomsControllerTests()
         {
+            _data = GetTestData();
+
             _repo = new Mock<IRepository<Room>>();
-            _repo.Setup(r => r.GetAllAsync()).ReturnsAsync(GetTestData());
-            _repo.Setup<Task<Room>>(r => r.GetByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => GetTestData().SingleOrDefault(r => r.Id == id));
+            _repo.Setup(r => r.GetAllAsync()).ReturnsAsync(_data);
+            _repo.Setup<Task<Room>>(r => r.GetByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => _data.SingleOrDefault(r => r.Id == id));
+            _repo.Setup(r => r.AddAsync(It.IsAny<Room>())).Callback((Room room) => _data.Add(room));
+            _repo.Setup(r => r.UpdateAsync(It.IsAny<Room>())).Callback((Room room) => _data[_data.FindIndex(r => r.Id == room.Id)] = room);
         }
 
 
@@ -43,10 +48,10 @@ namespace RoomReservationTests.Controllers
             var controller = new RoomsController(_repo.Object);
 
             // Act
-            var result = await controller.Index(null);
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var result = (ViewResult)await controller.Index(null);
+            //var viewResult = Assert.IsType<ViewResult>(result);
             // Assert
-            var model = Assert.IsAssignableFrom<List<Room>>(viewResult.ViewData.Model);
+            var model = Assert.IsAssignableFrom<List<Room>>(result.ViewData.Model);
         }
 
         [Fact]
@@ -56,9 +61,8 @@ namespace RoomReservationTests.Controllers
             var controller = new RoomsController(_repo.Object);
 
             // Act
-            var result = await controller.Index(null);
-            var viewResult = Assert.IsType<ViewResult>(result);
-            var model = Assert.IsAssignableFrom<List<Room>>(viewResult.ViewData.Model);
+            var result = (ViewResult)await controller.Index(null);
+            var model = (List<Room>)result.ViewData.Model;
             
             // Assert
             Assert.Equal(3,model.Count);
@@ -78,11 +82,10 @@ namespace RoomReservationTests.Controllers
         {
             // Arrange
             var controller = new RoomsController(_repo.Object);
-            // Act
-            var result = await controller.Index(searchString);
-            var viewResult = Assert.IsType<ViewResult>(result);
             
-            var model = Assert.IsAssignableFrom<List<Room>>(viewResult.ViewData.Model);
+            // Act
+            var result = (ViewResult)await controller.Index(searchString);
+            var model = (List<Room>)result.ViewData.Model;
 
             // Assert
             Assert.Single(model);
@@ -97,10 +100,8 @@ namespace RoomReservationTests.Controllers
             string searchString = "abcdefghi";
 
             // Act
-            var result = await controller.Index(searchString);
-            var viewResult = Assert.IsType<ViewResult>(result);
-
-            var model = Assert.IsAssignableFrom<List<Room>>(viewResult.ViewData.Model);
+            var result = (ViewResult)await controller.Index(searchString);
+            var model = (List<Room>)result.ViewData.Model;
 
             // Assert
             Assert.Empty(model);
@@ -118,8 +119,7 @@ namespace RoomReservationTests.Controllers
             var result = await controller.Details(null);
 
             // Assert
-            Assert.IsType<NotFoundResult>(result);
-            
+            Assert.IsType<NotFoundResult>(result);            
         }
 
         [Fact]
@@ -146,6 +146,146 @@ namespace RoomReservationTests.Controllers
 
             // Assert
             Assert.IsType<ViewResult>(result);
+        }
+        [Fact]
+        public async void Details_ReturnsModelOfTypeRoom()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+
+            // Act
+            var result = (ViewResult)await controller.Details("89bb2b92-7c90-441c-b293-9fc0f29fc20e");
+            var model = result.ViewData.Model;
+            // Assert
+            Assert.IsType<Room>(model);
+        }
+
+        [Fact]
+        public async Task Details_ReturnsModelWithId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            // Act
+            var result = (ViewResult)await controller.Details("89bb2b92-7c90-441c-b293-9fc0f29fc20e");
+            var model = (Room)result.ViewData.Model;
+            // Assert
+            Assert.Equal(GetTestData()[0].Id, model.Id);
+            Assert.Equal(GetTestData()[0].Description, model.Description);
+            Assert.Equal(GetTestData()[0].Location, model.Location);
+            Assert.Equal(GetTestData()[0].Name, model.Name);
+            Assert.Equal(GetTestData()[0].Reservations, model.Reservations);
+        }
+        #endregion
+
+        #region Create
+
+        [Fact]
+        public void Create_ReturnsView()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            // Act
+            var result = controller.Create();
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Create_AddModelToRepo()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var model = new Room
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "NewRoom",
+                Description = "New Description",
+                Location = "New Location",
+                Reservations = null
+            };
+            // Act
+            await controller.Create(model);
+            // Assert
+            Assert.Equal(4, _data.Count);
+        }
+
+        [Fact]
+        public async Task Create_DoesNotAddInvalidModelToRepo()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var model = new Room();
+            controller.ModelState.AddModelError("invalidModel", "The model is invalid");
+            // Act
+            await controller.Create(model);
+            // Assert
+            Assert.Equal(3,_data.Count);
+        }
+
+        #endregion
+
+        #region Edit
+        [Theory]
+        [InlineData(null)]
+        [InlineData("This is an invalid ID")]
+        public async Task Edit_ReturnNotFoundWhenWrongId(string id)
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            // Act
+            var result = await controller.Edit(id);
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Edit_ReturnViewResultWhenValidId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
+
+            // Act
+            var result = await controller.Edit(id);
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task Edit_ReplaceModelWithId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = _data[0].Id;
+            var model = new Room
+            {
+                Id = id,
+                Name = "Edited Name",
+                Description = "Edited Description", Location = "Edited Location", Reservations = _data[0].Reservations
+            };
+            // Act
+            var result = controller.Edit(id, model);
+
+            // Assert
+            Assert.Equal(_data[0].Id, model.Id);
+            Assert.Equal(_data[0].Name, model.Name);
+            Assert.Equal(_data[0].Description, model.Description);
+            Assert.Equal(_data[0].Location, model.Location);
+            Assert.Equal(_data[0].Reservations, model.Reservations);
+        }
+
+        [Fact]
+        public async Task Edit_ReturnNotFoundWhenIdDifferentFromModelId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = _data[0].Id;
+            var model = new Room { Id = Guid.NewGuid().ToString(), Name = null, Description = null, Location = null ,Reservations = null };
+            // Act
+            var result = await controller.Edit(id, model);
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
         }
         #endregion
         private List<Room> GetTestData()
