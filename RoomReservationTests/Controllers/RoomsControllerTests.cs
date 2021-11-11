@@ -25,6 +25,7 @@ namespace RoomReservationTests.Controllers
             _repo.Setup<Task<Room>>(r => r.GetByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => _data.SingleOrDefault(r => r.Id == id));
             _repo.Setup(r => r.AddAsync(It.IsAny<Room>())).Callback((Room room) => _data.Add(room));
             _repo.Setup(r => r.UpdateAsync(It.IsAny<Room>())).Callback((Room room) => _data[_data.FindIndex(r => r.Id == room.Id)] = room);
+            _repo.Setup(r => r.DeleteAsync(It.IsAny<Room>())).Callback((Room room) => _data.RemoveAt(_data.FindIndex(r => r.Id == room.Id)));
         }
 
 
@@ -286,6 +287,57 @@ namespace RoomReservationTests.Controllers
             var result = await controller.Edit(id, model);
             // Assert
             Assert.IsType<NotFoundResult>(result);
+        }
+        #endregion
+
+        #region Delete
+        [Theory]
+        [InlineData(null)]
+        [InlineData("This is an invalid ID")]
+        public async Task Delete_ReturnsNotFound_WhenWrongId(string id)
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            // Act
+            var result = await controller.Delete(id);
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsViewResult_WhenValidId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
+            // Act
+            var result = await controller.Delete(id);
+            // Assert
+            Assert.IsType<ViewResult>(result);
+        }
+
+        [Fact]
+        public async Task DeleteConfirmed_RemovesFromRepo_WhenValidId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
+            // Act
+            var result = await controller.DeleteConfirmed(id);
+            // Assert
+            Assert.Equal(2, _data.Count);
+        }
+
+        [Fact]
+        public async Task DeleteConfirmed_ReturnsRedirectToRoute_WhenValidId()
+        {
+            // Arrange
+            var controller = new RoomsController(_repo.Object);
+            var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
+            // Act
+            var result = await controller.DeleteConfirmed(id);
+            // Assert
+            Assert.IsType<RedirectToRouteResult>(result);
         }
         #endregion
         private List<Room> GetTestData()
