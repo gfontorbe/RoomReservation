@@ -33,7 +33,7 @@ namespace RoomReservation.Data.Repositories
 			return _dbContext.Set<T>().ToListAsync();
 		}
 
-		public Task<T> GetByIdAsync(string id)
+		public virtual Task<T> GetByIdAsync(string id)
 		{
 			return _dbContext.Set<T>().FirstOrDefaultAsync(m => m.Id == id);
 		}

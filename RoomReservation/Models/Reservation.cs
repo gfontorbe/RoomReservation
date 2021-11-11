@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace RoomReservation.Models
 {
-	public class Reservation
+	public class Reservation : IAppModel
 	{
 		// Properties
 		public string Id { get; set; }

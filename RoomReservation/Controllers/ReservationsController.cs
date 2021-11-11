@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RoomReservation.Data;
+using RoomReservation.Data.Repositories;
 using RoomReservation.Models;
 using System;
 using System.Collections.Generic;
@@ -14,12 +15,13 @@ namespace RoomReservation.Controllers
 	public class ReservationsController : Controller
 	{
 		private readonly UserManager<ApplicationUser> _userManager;
-		private readonly ApplicationDbContext _context;
+		private readonly IReservationRepository _repository;
 
-		public ReservationsController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+		public ReservationsController(UserManager<ApplicationUser> userManager, IReservationRepository repository)
 		{
 			_userManager = userManager;
-			_context = context;
+			_repository = repository;
+
 		}
 
 		public async Task<IActionResult> Create(CalendarViewModel calendarViewModel)
@@ -30,12 +32,11 @@ namespace RoomReservation.Controllers
 
 				reservation.StartingTime = calendarViewModel.ReservationToCreate.StartingTime;
 				reservation.EndingTime = calendarViewModel.ReservationToCreate.EndingTime;
-				reservation.ReservedRoom = await _context.Rooms.FindAsync(calendarViewModel.Room.Id);
+				reservation.ReservedRoom = await _repository.GetRoomById(calendarViewModel.Room.Id);
 				reservation.ReservingUser = await _userManager.FindByNameAsync(User.Identity.Name);
 
-				_context.Add(reservation);
-				await _context.SaveChangesAsync();
-
+                await _repository.AddAsync(reservation);
+				
 				return RedirectToRoute("return",routeValues: new {controller= "Calendars", action="ViewCalendar", id = reservation.ReservedRoom.Id });
 			}
 			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = calendarViewModel.Room.Id });
@@ -44,15 +45,14 @@ namespace RoomReservation.Controllers
 		public async Task<IActionResult> Edit(CalendarViewModel calendarViewModel)
 		{
 			// TODO:add check that the user is the correct one or is the admin (to avoid override by http request)
-			var reservationInDb = await _context.Reservations.FindAsync(calendarViewModel.ReservationToEdit.Id);
+			var reservationInDb = await _repository.GetByIdAsync(calendarViewModel.ReservationToEdit.Id);
 
 			if(reservationInDb.StartingTime != calendarViewModel.ReservationToEdit.StartingTime || reservationInDb.EndingTime != calendarViewModel.ReservationToEdit.EndingTime)
 			{
 				reservationInDb.StartingTime = calendarViewModel.ReservationToEdit.StartingTime;
 				reservationInDb.EndingTime = calendarViewModel.ReservationToEdit.EndingTime;
 
-				_context.Reservations.Update(reservationInDb);
-				await _context.SaveChangesAsync();
+				await _repository.UpdateAsync(reservationInDb);
 			}
 
 			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = calendarViewModel.Room.Id });
@@ -63,14 +63,10 @@ namespace RoomReservation.Controllers
 		{
 			// TODO:add check that the user is the correct one or is the admin (to avoid override by http request)
 
-			var reservationToDelete = await _context.Reservations.Where(x => x.Id == id)
-														.Include(r => r.ReservedRoom)
-														.FirstAsync();
-
-			_context.Reservations.Remove(reservationToDelete);
-			await _context.SaveChangesAsync();
-
-			//return RedirectToAction(controllerName: "Calendars", actionName: "ViewCalendar", routeValues: new { id = reservationToDelete.ReservedRoom.Id });
+			var reservationToDelete = await _repository.GetByIdAsync(id);
+				
+				//_context.Reservations.Where(x => x.Id == id)														.Include(r => r.ReservedRoom)														.FirstAsync();
+			await _repository.DeleteAsync(reservationToDelete);
 
 			return RedirectToRoute("return", routeValues: new { controller = "Calendars", action = "ViewCalendar", id = reservationToDelete.ReservedRoom.Id });
 		}
