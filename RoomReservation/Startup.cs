@@ -48,6 +48,7 @@ namespace RoomReservation
 			services.Configure<RoutingOptions>(Configuration.GetSection(RoutingOptions.Routing));
 
 			services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+			services.AddScoped(typeof(IReservationRepository), typeof(ReservationRepository));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
