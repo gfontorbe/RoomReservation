@@ -15,26 +15,35 @@ namespace RoomReservationTests.Controllers
     public class RoomsControllerTests
     {
         private readonly List<Room> _data;
-        private readonly Mock<IRepository<Room>> _repo;
+        private readonly MockRepository _mockRepository;
+        private readonly Mock<IRepository<Room>> _mockRoomRepository;
         public RoomsControllerTests()
         {
             _data = GetTestData();
 
-            _repo = new Mock<IRepository<Room>>();
-            _repo.Setup(r => r.GetAllAsync()).ReturnsAsync(_data);
-            _repo.Setup<Task<Room>>(r => r.GetByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => _data.SingleOrDefault(r => r.Id == id));
-            _repo.Setup(r => r.AddAsync(It.IsAny<Room>())).Callback((Room room) => _data.Add(room));
-            _repo.Setup(r => r.UpdateAsync(It.IsAny<Room>())).Callback((Room room) => _data[_data.FindIndex(r => r.Id == room.Id)] = room);
-            _repo.Setup(r => r.DeleteAsync(It.IsAny<Room>())).Callback((Room room) => _data.RemoveAt(_data.FindIndex(r => r.Id == room.Id)));
+            _mockRepository = new MockRepository(MockBehavior.Strict);
+
+            _mockRoomRepository = _mockRepository.Create<IRepository<Room>>();
+
+            _mockRoomRepository = new Mock<IRepository<Room>>();
+            _mockRoomRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(_data);
+            _mockRoomRepository.Setup<Task<Room>>(r => r.GetByIdAsync(It.IsAny<string>())).ReturnsAsync((string id) => _data.SingleOrDefault(r => r.Id == id));
+            _mockRoomRepository.Setup(r => r.AddAsync(It.IsAny<Room>())).Callback((Room room) => _data.Add(room));
+            _mockRoomRepository.Setup(r => r.UpdateAsync(It.IsAny<Room>())).Callback((Room room) => _data[_data.FindIndex(r => r.Id == room.Id)] = room);
+            _mockRoomRepository.Setup(r => r.DeleteAsync(It.IsAny<Room>())).Callback((Room room) => _data.RemoveAt(_data.FindIndex(r => r.Id == room.Id)));
         }
 
+        private RoomsController CreateRoomsController()
+        {
+            return new RoomsController(_mockRoomRepository.Object);
+        }
 
         #region Index
         [Fact]
         public async void Index_ReturnsViewResult()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = await controller.Index(null);
@@ -46,7 +55,7 @@ namespace RoomReservationTests.Controllers
         public async void Index_ModelOfType_ListOfRoom()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = (ViewResult)await controller.Index(null);
@@ -59,7 +68,7 @@ namespace RoomReservationTests.Controllers
         public async void Index_ModelContains_AllRoomsFromRepo()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = (ViewResult)await controller.Index(null);
@@ -82,8 +91,8 @@ namespace RoomReservationTests.Controllers
         public async Task Index_ModelFilter_FilterByName(string searchString)
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
-            
+            var controller = CreateRoomsController();
+
             // Act
             var result = (ViewResult)await controller.Index(searchString);
             var model = (List<Room>)result.ViewData.Model;
@@ -96,7 +105,7 @@ namespace RoomReservationTests.Controllers
         public async Task Index_ModelFilter_EmptyModel_WhenNoCorrespondingSearchString()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             string searchString = "abcdefghi";
 
@@ -114,7 +123,7 @@ namespace RoomReservationTests.Controllers
         public async void Details_ReturnsNotFound_WhenIdIsNull()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = await controller.Details(null);
@@ -127,7 +136,7 @@ namespace RoomReservationTests.Controllers
         public async void Details_ReturnsNotFound_WhenIdDoesNotExist()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = await controller.Details("This is an invalid ID");
@@ -140,7 +149,7 @@ namespace RoomReservationTests.Controllers
         public async void Details_ReturnsViewResult_WhenIsFound()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = await controller.Details("89bb2b92-7c90-441c-b293-9fc0f29fc20e");
@@ -152,7 +161,7 @@ namespace RoomReservationTests.Controllers
         public async void Details_ReturnsModelOfTypeRoom()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
 
             // Act
             var result = (ViewResult)await controller.Details("89bb2b92-7c90-441c-b293-9fc0f29fc20e");
@@ -165,7 +174,7 @@ namespace RoomReservationTests.Controllers
         public async Task Details_ReturnsModelWithId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             // Act
             var result = (ViewResult)await controller.Details("89bb2b92-7c90-441c-b293-9fc0f29fc20e");
             var model = (Room)result.ViewData.Model;
@@ -184,7 +193,7 @@ namespace RoomReservationTests.Controllers
         public void Create_ReturnsView()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             // Act
             var result = controller.Create();
             // Assert
@@ -195,7 +204,7 @@ namespace RoomReservationTests.Controllers
         public async Task Create_AddModelToRepo()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var model = new Room
             {
                 Id = Guid.NewGuid().ToString(),
@@ -214,7 +223,7 @@ namespace RoomReservationTests.Controllers
         public async Task Create_DoesNotAddInvalidModelToRepo()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var model = new Room();
             controller.ModelState.AddModelError("invalidModel", "The model is invalid");
             // Act
@@ -232,7 +241,7 @@ namespace RoomReservationTests.Controllers
         public async Task Edit_ReturnNotFoundWhenWrongId(string id)
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             // Act
             var result = await controller.Edit(id);
             // Assert
@@ -243,7 +252,7 @@ namespace RoomReservationTests.Controllers
         public async Task Edit_ReturnViewResultWhenValidId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
 
             // Act
@@ -257,7 +266,7 @@ namespace RoomReservationTests.Controllers
         public async Task Edit_ReplaceModelWithId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = _data[0].Id;
             var model = new Room
             {
@@ -280,7 +289,7 @@ namespace RoomReservationTests.Controllers
         public async Task Edit_ReturnNotFoundWhenIdDifferentFromModelId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = _data[0].Id;
             var model = new Room { Id = Guid.NewGuid().ToString(), Name = null, Description = null, Location = null ,Reservations = null };
             // Act
@@ -297,7 +306,7 @@ namespace RoomReservationTests.Controllers
         public async Task Delete_ReturnsNotFound_WhenWrongId(string id)
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             // Act
             var result = await controller.Delete(id);
             // Assert
@@ -308,7 +317,7 @@ namespace RoomReservationTests.Controllers
         public async Task Delete_ReturnsViewResult_WhenValidId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
             // Act
             var result = await controller.Delete(id);
@@ -320,7 +329,7 @@ namespace RoomReservationTests.Controllers
         public async Task DeleteConfirmed_RemovesFromRepo_WhenValidId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
             // Act
             var result = await controller.DeleteConfirmed(id);
@@ -332,7 +341,7 @@ namespace RoomReservationTests.Controllers
         public async Task DeleteConfirmed_ReturnsRedirectToRoute_WhenValidId()
         {
             // Arrange
-            var controller = new RoomsController(_repo.Object);
+            var controller = CreateRoomsController();
             var id = "89bb2b92-7c90-441c-b293-9fc0f29fc20e";
             // Act
             var result = await controller.DeleteConfirmed(id);
