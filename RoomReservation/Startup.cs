@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RoomReservation.Data;
+using RoomReservation.Data.Repositories;
 using RoomReservation.Models;
 using RoomReservation.Options;
 using System;
@@ -45,6 +46,9 @@ namespace RoomReservation
 			services.AddControllersWithViews();
 
 			services.Configure<RoutingOptions>(Configuration.GetSection(RoutingOptions.Routing));
+
+			services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+			services.AddScoped(typeof(IReservationRepository), typeof(ReservationRepository));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
